@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>     
+     <link href="../css/style.css" type="text/css" rel="stylesheet"/>
+
+     <style type="text/css">
+    body {
+      background-image: url(TRON.png);
+      background-color: black;
+      background-repeat: no-repeat;
+      background-size: 1500px;
+      background-position: 100% 70px;
+      /* background-repeat: space; */
+    }
+
+  </style>
+
+
+  </head>
+  <body>
+    <h1 class="title"> Connecter </h1>
+    
+          <div id="error" class="signinheader">
+          <% if (locals.error){ %>
+           <p><%= error %></p>
+          <% } %>
+          </div>
+
+
+
+      <aside id="start_menu">
+              
+              <form name="general"  method="POST" >
+                  <div class="inputs">  
+                          <input type="text" placeholder="Votre psudo" name="psudo" />
+                    </div>
+
+                    <div class="inputs">
+                          <input type="password" name="mot_pass" size="60" maxlength="60" placeholder="Votre mot de pass"/>
+                    </div>
+
+
+                    <div class="inputs">
+                          <input type="submit"  value="Connecter" class="btn"/>
+                    </div>
+
+
+
+              </form>
+         
+      </aside>
+    
+
+  </body>
+</html>

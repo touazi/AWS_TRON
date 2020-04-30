@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>io = io.connect()
+$(document).ready(function(){
+   
+    var canvas = $("#canvas")[0],
+        context = canvas.getContext("2d"),
+        cw = 5, // la taille de cellule de tron
+        direction,
+        playerName;
+    var tab_joueur = [];
+    io.on('Direction', function(data){
+        playerName = data;
+         //  38 ==> up 
+                //  40 ==> down 
+                //  37 ==> left
+                //  39 ==> right
+        if($(window).DeviceMotionEvent == undefined) {
+               $(document).keydown(function (e) {
+            var key = e.keyCode;
+            var ObjectData = new Object();
+            ObjectData.playerName = playerName;
+            if (key == "37" && direction != "39") {
+                direction = "37";
+            }
+            else if (key == "38" && direction != "40") {
+                direction = "38";
+            }
+            else if (key == "39" && direction != "37") {
+                direction = "39";
+            }
+            else if (key == "40" && direction != "38") {
+                direction = "40";
+            }
+             ObjectData.direction = direction;
+             io.emit('changer_direction', ObjectData);
+        });   
+        }
+    io.on('lancer_le_jeu', function(){
+     
+        $(".joueur").fadeIn(500);
+        context.clearRect(0, 0, $("#canvas").width(), $("#canvas").height())
+    });
+
+    });
+    io.on('mise_a_jour', function(data){
+        //construire canvas avec donnée
+        // les donné serons en JSON et seron un ensemble de coordonnée + nom
+        var tabJoueur = JSON.parse(data);
+        for(var i = 0; i<tabJoueur.length; i++) {
+            var estTrace = false;
+         var info = tabJoueur[i];
+            for(var j = 0; j<tab_joueur.length; j++) {
+                if (info.nom===tab_joueur[j].nom) {
+                    tab_joueur[j].trace = tab_joueur[j].trace.concat(info.trace);
+                    estTrace = true;
+                }
+            }
+            if (!estTrace) {
+              if(info.nom === playerName) {info.col = "#fc776d";
+              } else {info.col = "#6affea";}
+              var html ="<li style='color:"+info.col+"' id='"+info.nom+"'> "+info.nom+"</li>";
+              $(".joueur").prepend(html);
+              tab_joueur.push(info);
+            }
+
+        }
+
+        for(var i = 0; i<tab_joueur.length; i++) {
+            for(var j = 0; j<tab_joueur[i].trace.length; j++) {
+                context.fillStyle = tab_joueur[i].col;
+                context.fillRect(tab_joueur[i].trace[j].x*cw, tab_joueur[i].trace[j].y*cw, cw, cw);
+            }
+        }
+    });
+
+    io.on('perdre', function(data){
+      for(var i = 0; i<data.length; i++) {
+            $("#"+data[i]).css({'text-decoration':'line-through'});
+            if(data[i] === playerName){
+                $(document).unbind("keydown");
+                  $("#perdu").fadeIn();
+                  //$("#canvas").fadeOut();
+            }
+        }
+        });
+
+    io.on('gagner', function(data){
+        if(data === playerName){
+            $(document).unbind("keydown");
+              $("#gagnee").fadeIn();
+                //$("#canvas").fadeOut();
+        }
+    });
+
+    
+
+    $("#btn").click(function(e){
+        $("#historytable").fadeOut();
+        io.emit('connecter');
+        e.preventDefault();
+        $("aside").fadeOut(300,function(){
+            $("main").animate(
+              {
+                width: "1170px",
+                height: "108px"
+              },
+            300,function(){
+                    $("#jeu").fadeIn(300);
+            });
+        });
+    });
+});
+
+</script>
+
+      
+     <link href="css/style.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+    <h1 style="text-decoration: underline ; text-decoration-style:  double;">Tron</h1>
+    <div id="historytable" >
+        <table class="tab">
+                <tr>
+                        <th>Joueur</th> 
+                        <th>Nombre de partie jouer</th> 
+                        <th>Nombre de perdue </th> 
+                        <th>Nombre de gagnée </th>   
+                </tr>
+
+
+                        <td><%= psudo %></th> 
+                        <td><%= NbrPartieJouer %></td> 
+                        <td><%= NbrPartiePerdu %> </td> 
+                        <td><%= NbrPartieGagner %></td>
+                                  
+                 </tr>
+            </table>
+    
+    </div>
+        <aside class="btn_menu">
+                
+                <div class="inputs">
+                    <input type="submit"  href="#" value="joueur" id="btn" class="btn"/>       
+                
+                    <a  href="/quiter"  class="btn_input">quiter</a>
+                </div>
+        </aside>
+    <main>
+              <section id="jeu">
+                        <section id="les_joueurs">
+
+
+                            <div class= "En_ligne">
+                                <p style="color: #6d6bbf">En ligne : </p>
+                            </div>
+
+
+                            <div class= "En_ligne">
+                              <ul class="joueur"></ul> 
+                            </div>
+                        </section> 
+
+
+
+                <canvas id="canvas" width="1000" height="500"></canvas>
+                
+                <div class="fin_partie">
+
+                    <div id="perdu">
+                        <p >Vous avez perdu :( </p>
+                        <a href="javascript:window.location.reload();" style="color:#e08b36; margin-right: 20px;" onmouseover="this.style.color='#FF0000';" onmouseout="this.style.color='#e08b36';">Restart Game</a>
+
+                         <a  href="/quiter"  style="color:black; margin-left: 20px;" onmouseover="this.style.color='#FF0000';" onmouseout="this.style.color='black';">Quit</a>
+                
+                    </div>
+
+
+                    <div id="gagnee">
+                        <p >Vous avez gagné :) </p>
+                        <a href="javascript:window.location.reload();" style="color:#95b521; margin-right: 20px;" onmouseover="this.style.color='#ffea00';" onmouseout="this.style.color='#95b521';">Restart Game</a>
+
+                         <a  href="/quiter"  style="color:black; margin-left: 20px; margin-bottom: 20px;" onmouseover="this.style.color='#ffea00';" onmouseout="this.style.color='black';">Quit</a>
+                
+                    </div>
+
+                    
+                        
+                </div>
+
+              </section>
+    </main>
+
+  </body>
+</html>

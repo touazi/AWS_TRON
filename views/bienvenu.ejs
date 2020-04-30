@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+      
+     <link href="../css/style.css" type="text/css" rel="stylesheet"/>
+
+     <style type="text/css">
+    body {
+      background-image: url(TRON.png);
+      background-color: black;
+      background-repeat: no-repeat;
+      background-size: 1500px;
+      background-position: 100% 70px;
+      /* background-repeat: space; */
+    }
+
+  </style>
+
+
+  </head>
+
+
+  <body>
+     <h2 class="title">Welcome to</h2>
+     <h1 class="title">the Game of TrOn</h1>
+
+     <div class="signbar">
+
+
+            
+                        <div id="error" class="signinheader">
+                        <% if (locals.error){ %>
+                         <p><%= error %></p>
+                        <% } %>
+                        </div>
+
+
+                    
+                      
+                          <form name="general"  method="POST" >
+                              
+                              <div class="inputs">
+                                <input type="submit"  name="inscrivez" href="enregistrer.ejs" value="inscrivez vous" class="btn"/>
+                              </div>
+
+                                <br>
+
+                              <div class="inputs">
+                                <input type="submit" name="connecter" href="connecter.ejs" value="Connecter" class="btn "/>
+
+                              </div>
+
+
+                          </form>
+
+    </div>
+
+  </body>
+</html>
